@@ -2,13 +2,13 @@
 <html>
 
 <head>
-  <title>Signing in</title>
+  <title>Logging in</title>
 </head>
 
 <body>
   {% if session.username %}
   <p>
-    You are signed in with the username {{ session.username }}
+    Logged in with username {{ session.username }}
   </p>
   <p>
     <a href="/logout">Log out</a>
