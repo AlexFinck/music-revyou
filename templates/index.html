@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Music-revyou</title>
+</head>
+
+<body>
+    <h1>Music-revyou</h1>
+
+  {% if session.username %}
+  <p>
+    Logged in with username {{ session.username }}
+  </p>
+  {% endif %}
+
+    <p>
+    <a href="/login">Log in</a>
+    <a href="/register">Create account</a>
+    <a href="/logout">Log out</a>
+  </p>
+
+</body>
+
+</html>
