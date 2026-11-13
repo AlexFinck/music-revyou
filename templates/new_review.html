@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>New review</title>
+</head>
+
+<body>
+    <form action="/submit_review" method="post">
+        <p>
+            <h1>New review</h1>
+
+            Album title: <br />
+            <input type="text" name="album_title" />
+        </p>
+        <p>
+            Artist: <br />
+            <input type="text" name="artist" />
+        </p>
+        <p>
+            Release year: <br />
+            <input type="text" name="release_year" />
+        </p>
+        <p>
+            Rating (1–10): <br />
+            <input type="text" name="rating" />
+        </p>
+        <p>
+            Review: <br />
+            <textarea name="review" rows="5" cols="40"></textarea>
+        </p>
+        <input type="submit" value="Submit review" />
+    </form>
+</body>
+
+</html>

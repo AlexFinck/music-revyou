@@ -10,14 +10,18 @@
 
   {% if session.username %}
   <p>
-    Logged in with username {{ session.username }}
+    Logged in with username {{ session.username }}, your id-number is {{ session.user_id}}
   </p>
   {% endif %}
 
-    <p>
+  <p>
     <a href="/login">Log in</a>
     <a href="/register">Create account</a>
     <a href="/logout">Log out</a>
+  </p>
+
+  <p>
+    <a href="/new_review">New review</a>
   </p>
 
 </body>
