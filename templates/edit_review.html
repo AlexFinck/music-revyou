@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit review</title>
+</head>
+
+<body>
+    <form action="/update_review" method="post">
+        <p>
+            <h1>Edit review</h1>
+
+            Album title: <br />
+            <input type="text" name="album_title" value="{{ review.album_title }}" />
+        </p>
+        <p>
+            Artist: <br />
+            <input type="text" name="artist" value ="{{ review.artist}}" />
+        </p>
+        <p>
+            Release year: <br />
+            <input type="text" name="release_year" value ="{{ review.release_year}}"/>
+        </p>
+        <p>
+            Rating (1–10): <br />
+            <input type="text" name="rating" value ="{{ review.rating }}" />
+        </p>
+        <p>
+            Review: <br />
+            <textarea name="review" rows="5" cols="40">{{ review.review }}</textarea>
+        </p>
+        <input type="hidden" name="review_id" value="{{ review.id }}" />
+        <input type="submit" value="Apply changes" />
+    </form>
+</body>
+
+</html>
