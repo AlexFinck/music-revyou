@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ review.album_title }}</title>
+</head>
+
+<body>
+    <h1>{{ review.album_title }}</h1>
+
+    <p>
+        Artist: {{ review.artist }}
+    </p>
+    <p>
+        Release year: {{ review.release_year }}
+    </p>
+    <p>
+        Rating (1-10): {{ review.rating }}/10
+    </p>
+    <p>
+        Review: {{ review.review }}
+    </p>
+    <p>
+        Reviewed by: {{ review.username }}
+    </p>
+    <p>
+        <a href="/">Back to homepage</a>
+    </p>
+</body>
+
+</html>

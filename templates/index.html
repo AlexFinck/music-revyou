@@ -24,6 +24,13 @@
     <a href="/new_review">New review</a>
   </p>
 
+  <h2>Album reviews</h2>
+
+  <ul>
+   {% for review in reviews %}
+   <li><a href="/review/{{ review.id }}">{{review.album_title}}</a></li>
+   {% endfor %}
+  </ul>
 </body>
 
 </html>
