@@ -41,6 +41,26 @@ def edit_review(review_id):
     review = reviews.get_review(review_id)
     return render_template("edit_review.html", review = review)
 
+
+@app.route("/remove_review/<int:review_id>", methods=["GET", "POST"])
+def remove_review(review_id):
+    review = reviews.get_review(review_id)
+
+    if session.get("user_id") != review["user_id"]:
+        return redirect("/")
+
+    if request.method == "GET":
+        return render_template("remove_review.html", review=review)
+
+    if request.method == "POST":
+        if "remove" in request.form:
+            reviews.remove_review(review_id, session["user_id"])
+            return redirect("/")
+        else:
+            return redirect("/review/" + str(review_id))
+
+
+
 @app.route("/update_review", methods=["POST"])
 def update_review():
     review_id = request.form["review_id"]
