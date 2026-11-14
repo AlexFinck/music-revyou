@@ -39,3 +39,15 @@ def update_review(review_id, album_title, artist, release_year, rating, review):
 def remove_review(review_id, user_id):
     sql = """DELETE FROM reviews WHERE id = ? AND user_id = ?"""
     db.execute(sql, [review_id, user_id])
+
+def search_reviews(query):
+    sql = """SELECT 
+    id, 
+    album_title
+    FROM reviews
+    WHERE album_title LIKE ? OR artist LIKE ?
+    ORDER BY id DESC"""
+    like = "%" + query + "%"
+
+    return db.query(sql, ["%" + query + "%", "%" + query + "%"])
+    
