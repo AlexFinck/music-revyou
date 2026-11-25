@@ -6,31 +6,33 @@
 </head>
 
 <body>
-    <h1>Music-revyou</h1>
+  <h1>Music-revyou</h1>
 
-  {% if session.username %}
+  {% if session.user_id %}
   <p>
-    Logged in with username {{ session.username }}, your id-number is {{ session.user_id}}
+    Logged in with username {{ session.username }}, your id-number is {{ session.user_id }}
+  </p>
+  <p>
+    <a href="/logout">Log out</a>
+    <a href="/new_review">New review</a>
+  </p>
+  {% else %}
+  <p>
+    <a href="/login">Log in</a>
+    <a href="/register">Create account</a>
   </p>
   {% endif %}
 
   <p>
-    <a href="/login">Log in</a>
-    <a href="/register">Create account</a>
-    <a href="/logout">Log out</a>
-  </p>
-
-  <p>
-    <a href="/new_review">New review</a>
     <a href="/search_review">Search review</a>
   </p>
 
   <h2>Album reviews</h2>
 
   <ul>
-   {% for review in reviews %}
-   <li><a href="/review/{{ review.id }}">{{review.album_title}}</a></li>
-   {% endfor %}
+    {% for review in reviews %}
+    <li><a href="/review/{{ review.id }}">{{ review.album_title }}</a></li>
+    {% endfor %}
   </ul>
 </body>
 
