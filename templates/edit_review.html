@@ -6,6 +6,11 @@
 </head>
 
 <body>
+
+    {% for message in get_flashed_messages() %}
+        <p>{{ message }}</p>
+    {% endfor %}
+    
     <form action="/update_review" method="post">
         <p>
             <h1>Edit review</h1>

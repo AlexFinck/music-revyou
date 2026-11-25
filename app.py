@@ -5,9 +5,26 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import config
 import users
 import reviews
+from datetime import date
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
+
+
+def validate_review(release_year, rating):
+    try:
+        release_year = int(release_year)
+        rating = int(rating)
+    except ValueError:
+        return "Release year and rating must be integers"
+
+    if not 1900 <= release_year <= date.today().year:
+        return f"Release year must be between 1900 and {date.today().year}"
+
+    if not 1 <= rating <= 10:
+        return "Rating must be between 1 and 10"
+
+    return None
 
 @app.route("/")
 def index():
@@ -46,6 +63,12 @@ def submit_review():
     review = request.form["review"]
     user_id = session["user_id"]
 
+    error = validate_review(release_year, rating)
+
+    if error:
+        flash(error)
+        return redirect("/new_review")
+
     reviews.add_review(album_title, artist, release_year, rating, review, user_id)
 
     return redirect("/")
@@ -83,6 +106,12 @@ def update_review():
     release_year = request.form["release_year"]
     rating = request.form["rating"]
     review = request.form["review"]
+
+    error = validate_review(release_year, rating)
+
+    if error:
+        flash(error)
+        return redirect("/edit_review/" + str(review_id))
 
     reviews.update_review(review_id, album_title, artist, release_year, rating, review)
 
