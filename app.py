@@ -3,7 +3,7 @@ from flask import Flask
 from flask import redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 import config
-import db
+import users
 import reviews
 
 app = Flask(__name__)
@@ -103,8 +103,8 @@ def create():
     password_hash = generate_password_hash(password1)
 
     try:
-        sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
-        db.execute(sql, [username, password_hash])
+        users.create_user(username, password_hash)
+    
     except sqlite3.IntegrityError:
         return "ERROR: username taken"
 
@@ -121,8 +121,9 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-    sql = "SELECT id, password_hash FROM users WHERE username = ?"
-    result = password_hash = db.query(sql, [username])[0]
+    result = users.get_user(username)
+    if result is None:
+        return "ERROR: wrong username or password"
     user_id = result["id"]
     password_hash = result["password_hash"]
 
