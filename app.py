@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask
-from flask import redirect, render_template, request, session
+from flask import redirect, render_template, request, session, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 import config
 import users
@@ -99,41 +99,44 @@ def create():
     password2 = request.form["password2"]
 
     if password1 != password2:
-        return "ERROR: the passwords don't match"
+        flash("The passwords don't match")
+        return redirect("/register")
     password_hash = generate_password_hash(password1)
 
     try:
         users.create_user(username, password_hash)
     
     except sqlite3.IntegrityError:
-        return "ERROR: username taken"
+        flash("Username already taken")
+        return redirect("/register")
 
+    flash("Account created succesfully!")
     return redirect("/")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     if request.method == "GET":
         return render_template("login.html")
 
-    if request.method == "POST":
-
-        username = request.form["username"]
-        password = request.form["password"]
+    username = request.form["username"]
+    password = request.form["password"]
 
     result = users.get_user(username)
+
     if result is None:
-        return "ERROR: wrong username or password"
+        flash("Wrong username or password")
+        return redirect("/login")
+
     user_id = result["id"]
     password_hash = result["password_hash"]
-
 
     if check_password_hash(password_hash, password):
         session["user_id"] = user_id
         session["username"] = username
         return redirect("/")
     else:
-        return "ERROR: wrong username or password"
+        flash("Wrong username or password")
+        return redirect("/login")
 
 @app.route("/logout")
 def logout():

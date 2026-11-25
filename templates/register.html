@@ -6,6 +6,10 @@
 </head>
 
 <body>
+  {% for message in get_flashed_messages() %}
+    <p>{{ message }}</p>
+  {% endfor %}
+
   <form action="/create" method="post">
     <p>
       Username: <br />
@@ -21,8 +25,6 @@
     </p>
     <input type="submit" value="Create account" />
   </form>
-
-
 </body>
 
 </html>
