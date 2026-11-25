@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask
-from flask import redirect, render_template, request, session, flash
+from flask import abort, redirect, render_template, request, session, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 import config
 import users
@@ -76,12 +76,19 @@ def submit_review():
 @app.route("/edit_review/<int:review_id>")
 def edit_review(review_id):
     review = reviews.get_review(review_id)
+
+    if session.get("user_id") != review["user_id"]:
+        abort(403)
     return render_template("edit_review.html", review = review)
 
 
 @app.route("/remove_review/<int:review_id>", methods=["GET", "POST"])
 def remove_review(review_id):
     review = reviews.get_review(review_id)
+    user_id = session.get("user_id")
+
+    if user_id != review["user_id"]:
+        abort(403)
 
     if session.get("user_id") != review["user_id"]:
         return redirect("/")
@@ -93,6 +100,7 @@ def remove_review(review_id):
         if "remove" in request.form:
             reviews.remove_review(review_id, session["user_id"])
             return redirect("/")
+        
         else:
             return redirect("/review/" + str(review_id))
 
@@ -101,6 +109,11 @@ def remove_review(review_id):
 @app.route("/update_review", methods=["POST"])
 def update_review():
     review_id = request.form["review_id"]
+    review = reviews.get_review(review_id)
+
+    if session.get("user_id") != review["user_id"]:
+        abort(403)
+
     album_title = request.form["album_title"]
     artist = request.form["artist"]
     release_year = request.form["release_year"]
