@@ -25,7 +25,8 @@ def get_review(review_id):
     FROM users u, reviews r
     WHERE u.id = r.user_id
     AND r.id = ?"""
-    return db.query(sql, [review_id])[0]
+    result = db.query(sql, [review_id])
+    return result[0] if result else None
 
 def update_review(review_id, album_title, artist, release_year, rating, review):
     sql = """UPDATE reviews SET album_title = ?,
