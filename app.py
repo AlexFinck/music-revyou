@@ -42,7 +42,8 @@ def show_review(review_id):
     if not review:
         abort(404)
 
-    return render_template("show_review.html", review=review)
+    classes = reviews.get_classes(review_id)
+    return render_template("show_review.html", review=review, classes=classes)
 
 @app.route("/new_review")
 def new_review():
@@ -57,7 +58,19 @@ def submit_review():
     review = request.form["review"]
     user_id = session["user_id"]
 
+    classes = []
+    genre = request.form["genre"]
+
+    if genre:
+        classes.append(("Genre", genre))
+
+    language = request.form["language"]
+
+    if language:
+        classes.append(("Language", language))
+
     error = validate_review(album_title, artist, release_year, rating, review)
+
 
     if error:
         flash(error)
@@ -66,7 +79,7 @@ def submit_review():
     release_year = int(release_year)
     rating = int(rating)
 
-    reviews.add_review(album_title, artist, release_year, rating, review, user_id)
+    reviews.add_review(album_title, artist, release_year, rating, review, user_id, classes)
 
     return redirect("/")
 

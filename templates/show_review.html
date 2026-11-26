@@ -15,7 +15,12 @@
     {% endif %}
     <p>
         Artist: {{ review.artist }}
-    </p>
+    </p>    
+    {% for classification in classes %}
+        {% if classification.value %}
+            <p>{{ classification.title }}: {{ classification.value }}</p>
+        {% endif %}
+    {% endfor %}
     <p>
         Release year: {{ review.release_year }}
     </p>
@@ -29,7 +34,7 @@
         Reviewed by:<a href="/user/{{review.user_id}}"> {{ review.username }} </a>
     </p>
     <p>
-        <a href="/">Back to homepage</a>
+    <a href="/">Back to homepage</a>
     </p>
 </body>
 

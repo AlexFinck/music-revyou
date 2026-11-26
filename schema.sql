@@ -13,3 +13,10 @@ CREATE TABLE reviews (
     review TEXT,
     user_id INTEGER NOT NULL REFERENCES users
 );
+
+CREATE TABLE review_classes (
+    id INTEGER PRIMARY KEY,
+    review_id INTEGER NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    value TEXT NOT NULL
+);
