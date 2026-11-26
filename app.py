@@ -1,7 +1,6 @@
 import sqlite3
 from flask import Flask
 from flask import abort, redirect, render_template, request, session, flash
-from werkzeug.security import check_password_hash, generate_password_hash
 import config
 import users
 import reviews
@@ -101,7 +100,7 @@ def remove_review(review_id):
         if "remove" in request.form:
             reviews.remove_review(review_id, session["user_id"])
             return redirect("/")
-        
+
         else:
             return redirect("/review/" + str(review_id))
 
@@ -187,11 +186,10 @@ def create():
     if password1 != password2:
         flash("The passwords don't match")
         return redirect("/register")
-    password_hash = generate_password_hash(password1)
 
     try:
-        users.create_user(username, password_hash)
-    
+        users.create_user(username, password1)
+
     except sqlite3.IntegrityError:
         flash("Username already taken")
         return redirect("/register")
@@ -206,23 +204,15 @@ def login():
 
     username = request.form["username"]
     password = request.form["password"]
+    user_id = users.check_login(username, password)
 
-    result = users.get_user(username)
-
-    if result is None:
+    if user_id is None:
         flash("Wrong username or password")
         return redirect("/login")
 
-    user_id = result["id"]
-    password_hash = result["password_hash"]
-
-    if check_password_hash(password_hash, password):
-        session["user_id"] = user_id
-        session["username"] = username
-        return redirect("/")
-    else:
-        flash("Wrong username or password")
-        return redirect("/login")
+    session["user_id"] = user_id
+    session["username"] = username
+    return redirect("/")
 
 @app.route("/logout")
 def logout():
