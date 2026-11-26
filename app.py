@@ -10,12 +10,19 @@ from datetime import date
 app = Flask(__name__)
 app.secret_key = config.secret_key
 
-
-
 @app.route("/")
 def index():
     all_reviews = reviews.get_reviews()
     return render_template("index.html", reviews=all_reviews)
+
+@app.route("/user/<int:user_id>")
+def show_user(user_id):
+    user = users.get_user_by_id(user_id)
+    if user is None:
+        abort(404)
+
+    user_reviews = users.get_reviews_by_user(user_id)
+    return render_template("show_user.html", user=user, reviews=user_reviews)
 
 @app.route("/search_review")
 def search_review():
@@ -29,7 +36,6 @@ def search_review():
         results = []
 
     return render_template("search_review.html", query=query, results=results)
-
 
 @app.route("/review/<int:review_id>")
 def show_review(review_id):

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>User {{ user.username }}</title>
+</head>
+
+<body>
+  <h1>User {{ user.username }}</h1>
+
+  {% set review_count = reviews | count %}
+  <p>Total reviews: {{ review_count }}</p>
+
+  {% if review_count %}
+    {% set average_rating = (reviews | sum(attribute="rating")) / review_count %}
+    <p>Average rating: {{ "%.1f" | format(average_rating) }}/10</p>
+  {% endif %}
+
+  <h2>Album reviews</h2>
+  <ul>
+    {% for review in reviews %}
+      <li><a href="/review/{{ review.id }}">{{ review.album_title }}</a></li>
+    {% endfor %}
+  </ul>
+
+  <p><a href="/">Back</a></p>
+</body>
+
+</html>
