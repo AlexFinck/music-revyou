@@ -11,20 +11,6 @@ app = Flask(__name__)
 app.secret_key = config.secret_key
 
 
-def validate_review(release_year, rating):
-    try:
-        release_year = int(release_year)
-        rating = int(rating)
-    except ValueError:
-        return "Release year and rating must be integers"
-
-    if not 1900 <= release_year <= date.today().year:
-        return f"Release year must be between 1900 and {date.today().year}"
-
-    if not 1 <= rating <= 10:
-        return "Rating must be between 1 and 10"
-
-    return None
 
 @app.route("/")
 def index():
@@ -66,11 +52,14 @@ def submit_review():
     review = request.form["review"]
     user_id = session["user_id"]
 
-    error = validate_review(release_year, rating)
+    error = validate_review(album_title, artist, release_year, rating, review)
 
     if error:
         flash(error)
         return redirect("/new_review")
+
+    release_year = int(release_year)
+    rating = int(rating)
 
     reviews.add_review(album_title, artist, release_year, rating, review, user_id)
 
@@ -129,15 +118,55 @@ def update_review():
     rating = request.form["rating"]
     review = request.form["review"]
 
-    error = validate_review(release_year, rating)
+    error = validate_review(album_title, artist, release_year, rating, review)
 
     if error:
         flash(error)
         return redirect("/edit_review/" + str(review_id))
 
+    release_year = int(release_year)
+    rating = int(rating)
+
+
     reviews.update_review(review_id, album_title, artist, release_year, rating, review)
 
     return redirect("/review/" + str(review_id))
+
+def validate_review(album_title, artist, release_year, rating, review):
+    album_title = album_title.strip()
+    artist = artist.strip()
+
+    if not album_title:
+        return "Enter an album title."
+    if len(album_title) > 200:
+        return "Album title must be 200 characters or fewer."
+
+    if not artist:
+        return "Enter an artist."
+    if len(artist) > 200:
+        return "Artist must be 200 characters or fewer."
+
+    try:
+        release_year = int(release_year)
+    except ValueError:
+        return "Release year must be a whole number."
+
+    current_year = date.today().year
+    if not 1900 <= release_year <= current_year:
+        return f"Release year must be between 1900 and {current_year}."
+
+    try:
+        rating = int(rating)
+    except ValueError:
+        return "Rating must be a whole number."
+
+    if not 1 <= rating <= 10:
+        return "Rating must be between 1 and 10."
+
+    if len(review.split()) > 500:
+        return "Review must be 500 words or fewer."
+
+    return None
 
 @app.route("/register")
 def register():

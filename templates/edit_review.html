@@ -6,33 +6,32 @@
 </head>
 
 <body>
-
     {% for message in get_flashed_messages() %}
         <p>{{ message }}</p>
     {% endfor %}
-    
-    <form action="/update_review" method="post">
-        <p>
-            <h1>Edit review</h1>
 
+    <form action="/update_review" method="post">
+        <h1>Edit review</h1>
+
+        <p>
             Album title: <br />
-            <input type="text" name="album_title" value="{{ review.album_title }}" />
+            <input type="text" name="album_title" maxlength="200" value="{{ review.album_title }}" required />
         </p>
         <p>
             Artist: <br />
-            <input type="text" name="artist" value ="{{ review.artist}}" />
+            <input type="text" name="artist" maxlength="200" value="{{ review.artist }}" required />
         </p>
         <p>
             Release year: <br />
-            <input type="text" name="release_year" value ="{{ review.release_year}}"/>
+            <input type="text" name="release_year" value="{{ review.release_year }}" required />
         </p>
         <p>
-            Rating (1–10): <br />
-            <input type="text" name="rating" value ="{{ review.rating }}" />
+            Rating (1-10): <br />
+            <input type="text" name="rating" value="{{ review.rating }}" required />
         </p>
         <p>
-            Review: <br />
-            <textarea name="review" rows="5" cols="40">{{ review.review }}</textarea>
+            Review (optional): <br />
+            <textarea name="review" rows="5" cols="40">{{ review.review or '' }}</textarea>
         </p>
         <input type="hidden" name="review_id" value="{{ review.id }}" />
         <input type="submit" value="Apply changes" />

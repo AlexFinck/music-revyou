@@ -6,32 +6,31 @@
 </head>
 
 <body>
-
     {% for message in get_flashed_messages() %}
         <p>{{ message }}</p>
     {% endfor %}
 
     <form action="/submit_review" method="post">
-        <p>
-            <h1>New review</h1>
+        <h1>New review</h1>
 
+        <p>
             Album title: <br />
-            <input type="text" name="album_title" />
+            <input type="text" name="album_title" maxlength="200" required/>
         </p>
         <p>
             Artist: <br />
-            <input type="text" name="artist" />
+            <input type="text" name="artist" maxlength="200" required/>
         </p>
         <p>
             Release year: <br />
-            <input type="text" name="release_year" />
+            <input type="text" name="release_year" required/>
         </p>
         <p>
-            Rating (1–10): <br />
-            <input type="text" name="rating" />
+            Rating (1-10): <br />
+            <input type="text" name="rating" required />
         </p>
         <p>
-            Review: <br />
+            Review (optional): <br />
             <textarea name="review" rows="5" cols="40"></textarea>
         </p>
         <input type="submit" value="Submit review" />
