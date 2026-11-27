@@ -1,10 +1,12 @@
 import sqlite3
 from flask import Flask
-from flask import abort, redirect, render_template, request, session, flash
+from flask import url_for, abort, redirect, render_template, request, session, flash
 import config
 import users
 import reviews
 from datetime import date
+from secrets import compare_digest, token_hex
+
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -43,7 +45,41 @@ def show_review(review_id):
         abort(404)
 
     classes = reviews.get_classes(review_id)
-    return render_template("show_review.html", review=review, classes=classes)
+    comments = reviews.get_comments(review_id)
+
+    if session.get("user_id") is not None and "comment_token" not in session:
+        session["comment_token"] = token_hex(32)
+
+    return render_template(
+        "show_review.html", review=review, classes=classes, comments=comments
+    )
+
+
+@app.route("/create_comment", methods=["POST"])
+def create_comment():
+    user_id = require_login()
+
+    token = session.get("comment_token")
+    submitted_token = request.form.get("comment_token", "")
+    if not token or not compare_digest(token.encode(), submitted_token.encode()):
+        abort(403)
+
+    review_id = request.form.get("review_id", type=int)
+    if review_id is None or reviews.get_review(review_id) is None:
+        abort(404)
+
+    body = request.form.get("comment", "").strip()
+    if not body or len(body) > 500:
+        flash("Enter a comment between 1 and 500 characters.", "comment")
+    else:
+        try:
+            reviews.add_comment(review_id, user_id, body)
+        except sqlite3.IntegrityError as error:
+            if error.sqlite_errorcode == sqlite3.SQLITE_CONSTRAINT_FOREIGNKEY:
+                abort(404)
+            raise
+
+    return redirect(url_for("show_review", review_id=review_id, _anchor="comments"))
 
 def require_login():
     user_id = session.get("user_id")
@@ -186,6 +222,8 @@ def validate_review(album_title, artist, release_year, rating, review, classes):
 
     if classes:
         all_classes = reviews.get_all_classes()
+        seen_titles = set()
+
 
         for parts in classes:
             if len(parts) != 2 or parts[0] not in all_classes:
@@ -193,7 +231,11 @@ def validate_review(album_title, artist, release_year, rating, review, classes):
 
             title, value = parts
             if value not in all_classes[title]:
-                return f"Choose a valid {title.lower()}."   
+                return f"Choose a valid {title.lower()}."
+
+            if title in seen_titles:
+                return f"Choose only one {title.lower()}."
+            seen_titles.add(title)
 
     try:
         release_year = int(release_year)
@@ -254,6 +296,7 @@ def login():
         flash("Wrong username or password")
         return redirect("/login")
 
+    session.pop("comment_token", None)
     session["user_id"] = user_id
     session["username"] = username
     return redirect("/")

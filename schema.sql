@@ -26,3 +26,10 @@ CREATE TABLE review_classes (
     title TEXT NOT NULL,
     value TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS comments (
+    id INTEGER PRIMARY KEY,
+    review_id INTEGER NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    body TEXT NOT NULL
+);

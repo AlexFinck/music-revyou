@@ -84,3 +84,14 @@ def search_reviews(query):
 
     return db.query(sql, ["%" + query + "%", "%" + query + "%"])
     
+def add_comment(review_id, user_id, body):
+    sql = "INSERT INTO comments (review_id, user_id, body) VALUES (?, ?, ?)"
+    db.execute(sql, [review_id, user_id, body])
+
+
+def get_comments(review_id):
+    sql = """SELECT comments.body, users.id AS user_id, users.username
+             FROM comments JOIN users ON comments.user_id = users.id
+             WHERE comments.review_id = ?
+             ORDER BY comments.id DESC"""
+    return db.query(sql, [review_id])

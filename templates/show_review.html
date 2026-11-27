@@ -33,6 +33,42 @@
     <p>
         Reviewed by:<a href="/user/{{review.user_id}}"> {{ review.username }} </a>
     </p>
+    <h2 id="comments">Comments</h2>
+    {% if comments %}
+        <ul>
+            {% for comment in comments %}
+                <li>
+                    {{ comment.body }},
+                    <a href="/user/{{ comment.user_id }}">{{ comment.username }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No comments yet.</p>
+    {% endif %}
+
+    {% if session.get("user_id") is not none %}
+        <h2>New comment</h2>
+
+        {% for message in get_flashed_messages(category_filter=["comment"]) %}
+            <p>{{ message }}</p>
+        {% endfor %}
+
+        <form action="/create_comment" method="post">
+            <input type="hidden" name="review_id" value="{{ review.id }}" />
+            <input type="hidden" name="comment_token" value="{{ session.comment_token }}" />
+
+            <p>
+                <label for="comment">Comment:</label><br />
+                <textarea id="comment" name="comment" rows="3" cols="40"
+                      maxlength="500" required></textarea>
+            </p>
+
+            <input type="submit" value="Post comment" />
+        </form>
+    {% else %}
+        <p><a href="/login">Log in</a> to comment.</p>
+    {% endif %}
     <p>
     <a href="/">Back to homepage</a>
     </p>
