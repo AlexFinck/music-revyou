@@ -66,21 +66,19 @@ def submit_review():
     rating = request.form["rating"]
     review = request.form["review"]
 
-    error = validate_review(album_title, artist, release_year, rating, review)
+    classes = [
+        entry.split(":", 1)
+        for entry in request.form.getlist("classes")
+        if entry
+    ]
 
-
+    error = validate_review(album_title, artist, release_year, rating, review, classes)
     if error:
         flash(error)
         return redirect("/new_review")
 
     release_year = int(release_year)
     rating = int(rating)
-
-    classes = []
-    for entry in request.form.getlist("classes"):
-        if entry:
-            parts = entry.split(":")
-            classes.append((parts[0], parts[1]))
 
     reviews.add_review(album_title, artist, release_year, rating, review, user_id, classes)
 
@@ -154,8 +152,13 @@ def update_review():
     rating = request.form["rating"]
     review = request.form["review"]
 
-    error = validate_review(album_title, artist, release_year, rating, review)
+    classes = [
+        entry.split(":", 1)
+        for entry in request.form.getlist("classes")
+        if entry
+    ]
 
+    error = validate_review(album_title, artist, release_year, rating, review, classes)
     if error:
         flash(error)
         return redirect("/edit_review/" + str(review_id))
@@ -163,18 +166,11 @@ def update_review():
     release_year = int(release_year)
     rating = int(rating)
 
-    classes = []
-    for entry in request.form.getlist("classes"):
-        if entry:
-            parts = entry.split(":")
-            classes.append((parts[0], parts[1]))
-
-
     reviews.update_review(review_id, album_title, artist, release_year, rating, review, classes)
 
     return redirect("/review/" + str(review_id))
 
-def validate_review(album_title, artist, release_year, rating, review):
+def validate_review(album_title, artist, release_year, rating, review, classes):
     album_title = album_title.strip()
     artist = artist.strip()
 
@@ -187,6 +183,17 @@ def validate_review(album_title, artist, release_year, rating, review):
         return "Enter an artist."
     if len(artist) > 200:
         return "Artist must be 200 characters or fewer."
+
+    if classes:
+        all_classes = reviews.get_all_classes()
+
+        for parts in classes:
+            if len(parts) != 2 or parts[0] not in all_classes:
+                return "Choose a valid genre or language."
+
+            title, value = parts
+            if value not in all_classes[title]:
+                return f"Choose a valid {title.lower()}."   
 
     try:
         release_year = int(release_year)
