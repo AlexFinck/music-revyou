@@ -14,6 +14,12 @@ CREATE TABLE reviews (
     user_id INTEGER NOT NULL REFERENCES users
 );
 
+CREATE TABLE classes (
+    id INTEGER PRIMARY KEY,
+    title TEXT,
+    value TEXT
+);
+
 CREATE TABLE review_classes (
     id INTEGER PRIMARY KEY,
     review_id INTEGER NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,

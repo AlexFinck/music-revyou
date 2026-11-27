@@ -45,29 +45,26 @@ def show_review(review_id):
     classes = reviews.get_classes(review_id)
     return render_template("show_review.html", review=review, classes=classes)
 
+def require_login():
+    user_id = session.get("user_id")
+    if user_id is None:
+        abort(403)
+    return user_id
+
 @app.route("/new_review")
 def new_review():
-    return render_template("new_review.html")
+    require_login()
+    classes = reviews.get_all_classes()
+    return render_template("new_review.html", classes=classes)
 
 @app.route("/submit_review", methods=["POST"])
 def submit_review():
+    user_id = require_login()
     album_title = request.form["album_title"]
     artist = request.form["artist"]
     release_year = request.form["release_year"]
     rating = request.form["rating"]
     review = request.form["review"]
-    user_id = session["user_id"]
-
-    classes = []
-    genre = request.form["genre"]
-
-    if genre:
-        classes.append(("Genre", genre))
-
-    language = request.form["language"]
-
-    if language:
-        classes.append(("Language", language))
 
     error = validate_review(album_title, artist, release_year, rating, review)
 
@@ -78,6 +75,12 @@ def submit_review():
 
     release_year = int(release_year)
     rating = int(rating)
+
+    classes = []
+    for entry in request.form.getlist("classes"):
+        if entry:
+            parts = entry.split(":")
+            classes.append((parts[0], parts[1]))
 
     reviews.add_review(album_title, artist, release_year, rating, review, user_id, classes)
 
