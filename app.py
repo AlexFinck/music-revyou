@@ -95,7 +95,22 @@ def edit_review(review_id):
 
     if session.get("user_id") != review["user_id"]:
         abort(403)
-    return render_template("edit_review.html", review = review)
+
+    all_classes = reviews.get_all_classes()
+    classes = {}
+
+    for title in all_classes:
+        classes[title] = ""
+
+    for entry in reviews.get_classes(review_id):
+        classes[entry["title"]] = entry["value"]
+
+    return render_template(
+        "edit_review.html",
+        review=review,
+        classes=classes,
+        all_classes=all_classes,
+    )
 
 
 @app.route("/remove_review/<int:review_id>", methods=["GET", "POST"])
@@ -148,8 +163,14 @@ def update_review():
     release_year = int(release_year)
     rating = int(rating)
 
+    classes = []
+    for entry in request.form.getlist("classes"):
+        if entry:
+            parts = entry.split(":")
+            classes.append((parts[0], parts[1]))
 
-    reviews.update_review(review_id, album_title, artist, release_year, rating, review)
+
+    reviews.update_review(review_id, album_title, artist, release_year, rating, review, classes)
 
     return redirect("/review/" + str(review_id))
 

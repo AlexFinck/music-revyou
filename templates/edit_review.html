@@ -21,6 +21,21 @@
             Artist: <br />
             <input type="text" name="artist" maxlength="200" value="{{ review.artist }}" required />
         </p>
+        {% for title in all_classes %}
+            <p>
+                {{ title }}: <br />
+                <select name="classes">
+                    <option value="">(choose)</option>
+                    {% for option in all_classes[title] %}
+                        {% if classes[title] == option %}
+                            <option value="{{ title }}:{{ option }}" selected>{{ option }}</option>
+                        {% else %}
+                            <option value="{{ title }}:{{ option }}">{{ option }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </p>
+        {% endfor %}
         <p>
             Release year: <br />
             <input type="text" name="release_year" value="{{ review.release_year }}" required />

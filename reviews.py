@@ -50,14 +50,24 @@ def get_review(review_id):
     result = db.query(sql, [review_id])
     return result[0] if result else None
 
-def update_review(review_id, album_title, artist, release_year, rating, review):
-    sql = """UPDATE reviews SET album_title = ?,
-    artist = ?,
-    release_year = ?,
-    rating = ?,
-    review = ?
-    WHERE id = ?"""
-    db.execute(sql, [album_title, artist, release_year, rating, review, review_id])
+def update_review(review_id, album_title, artist, release_year, rating, review, classes):
+    connection = db.get_connection()
+
+    try:
+        with connection:
+            sql = """UPDATE reviews
+                     SET album_title = ?, artist = ?, release_year = ?, rating = ?, review = ?
+                     WHERE id = ?"""
+            connection.execute(sql, [album_title, artist, release_year, rating, review, review_id])
+
+            sql = "DELETE FROM review_classes WHERE review_id = ?"
+            connection.execute(sql, [review_id])
+
+            sql = "INSERT INTO review_classes (review_id, title, value) VALUES (?, ?, ?)"
+            for title, value in classes:
+                connection.execute(sql, [review_id, title, value])
+    finally:
+        connection.close()
 
 def remove_review(review_id, user_id):
     sql = """DELETE FROM reviews WHERE id = ? AND user_id = ?"""
