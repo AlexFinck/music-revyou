@@ -31,6 +31,5 @@ INSERT INTO classes (title, value) VALUES
     ('Language', 'Mandarin Chinese'),
     ('Language', 'Arabic'),
     ('Language', 'Hindi'),
-    ('Language', 'Multiple languages'),
     ('Language', 'Instrumental'),
     ('Language', 'Other');

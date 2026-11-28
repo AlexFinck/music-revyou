@@ -131,13 +131,10 @@ def edit_review(review_id):
         abort(403)
 
     all_classes = reviews.get_all_classes()
-    classes = {}
-
-    for title in all_classes:
-        classes[title] = ""
+    classes = {title: [] for title in all_classes}
 
     for entry in reviews.get_classes(review_id):
-        classes[entry["title"]] = entry["value"]
+        classes.setdefault(entry["title"], []).append(entry["value"])
 
     return render_template(
         "edit_review.html",
@@ -222,8 +219,7 @@ def validate_review(album_title, artist, release_year, rating, review, classes):
 
     if classes:
         all_classes = reviews.get_all_classes()
-        seen_titles = set()
-
+        seen_choices = set()
 
         for parts in classes:
             if len(parts) != 2 or parts[0] not in all_classes:
@@ -233,9 +229,10 @@ def validate_review(album_title, artist, release_year, rating, review, classes):
             if value not in all_classes[title]:
                 return f"Choose a valid {title.lower()}."
 
-            if title in seen_titles:
-                return f"Choose only one {title.lower()}."
-            seen_titles.add(title)
+            choice = (title, value)
+            if choice in seen_choices:
+                return f"Choose each {title.lower()} only once."
+            seen_choices.add(choice)
 
     try:
         release_year = int(release_year)

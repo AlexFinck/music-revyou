@@ -21,21 +21,6 @@
             Artist: <br />
             <input type="text" name="artist" maxlength="200" value="{{ review.artist }}" required />
         </p>
-        {% for title in all_classes %}
-            <p>
-                {{ title }}: <br />
-                <select name="classes">
-                    <option value="">(choose)</option>
-                    {% for option in all_classes[title] %}
-                        {% if classes[title] == option %}
-                            <option value="{{ title }}:{{ option }}" selected>{{ option }}</option>
-                        {% else %}
-                            <option value="{{ title }}:{{ option }}">{{ option }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </p>
-        {% endfor %}
         <p>
             Release year: <br />
             <input type="text" name="release_year" value="{{ review.release_year }}" required />
@@ -44,6 +29,19 @@
             Rating (1-10): <br />
             <input type="text" name="rating" value="{{ review.rating }}" required />
         </p>
+        {% for title in all_classes %}
+            <details>
+                <summary>Choose {{ title | lower }}</summary>
+                {% for option in all_classes[title] %}
+                    <div>
+                        <label>
+                            <input type="checkbox" name="classes" value="{{ title }}:{{ option }}"{% if option in classes[title] %} checked{% endif %} />
+                            {{ option }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </details>
+        {% endfor %}
         <p>
             Review (optional): <br />
             <textarea name="review" rows="5" cols="40">{{ review.review or '' }}</textarea>
