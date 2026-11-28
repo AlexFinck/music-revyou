@@ -47,9 +47,6 @@ def show_review(review_id):
     classes = reviews.get_classes(review_id)
     comments = reviews.get_comments(review_id)
 
-    if session.get("user_id") is not None and "comment_token" not in session:
-        session["comment_token"] = token_hex(32)
-
     return render_template(
         "show_review.html", review=review, classes=classes, comments=comments
     )
@@ -58,11 +55,7 @@ def show_review(review_id):
 @app.route("/create_comment", methods=["POST"])
 def create_comment():
     user_id = require_login()
-
-    token = session.get("comment_token")
-    submitted_token = request.form.get("comment_token", "")
-    if not token or not compare_digest(token.encode(), submitted_token.encode()):
-        abort(403)
+    check_csrf()
 
     review_id = request.form.get("review_id", type=int)
     if review_id is None or reviews.get_review(review_id) is None:
@@ -81,6 +74,14 @@ def create_comment():
 
     return redirect(url_for("show_review", review_id=review_id, _anchor="comments"))
 
+def check_csrf():
+    token = session.get("csrf_token")
+    submitted = request.form.get("csrf_token", "")
+    if not token or not compare_digest(token.encode(), submitted.encode()):
+        abort(403)
+
+
+
 def require_login():
     user_id = session.get("user_id")
     if user_id is None:
@@ -96,6 +97,7 @@ def new_review():
 @app.route("/submit_review", methods=["POST"])
 def submit_review():
     user_id = require_login()
+    check_csrf()
     album_title = request.form["album_title"]
     artist = request.form["artist"]
     release_year = request.form["release_year"]
@@ -159,6 +161,7 @@ def remove_review(review_id):
         return render_template("remove_review.html", review=review)
 
     if request.method == "POST":
+        check_csrf()
         if "remove" in request.form:
             reviews.remove_review(review_id, session["user_id"])
             return redirect("/")
@@ -170,6 +173,8 @@ def remove_review(review_id):
 
 @app.route("/update_review", methods=["POST"])
 def update_review():
+    require_login()
+    check_csrf()    
     review_id = request.form["review_id"]
     review = reviews.get_review(review_id)
 
@@ -293,14 +298,15 @@ def login():
         flash("Wrong username or password")
         return redirect("/login")
 
-    session.pop("comment_token", None)
     session["user_id"] = user_id
     session["username"] = username
+    session["csrf_token"] = token_hex(16)
     return redirect("/")
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
 def logout():
-    del session["user_id"]
-    del session["username"]
+    require_login()
+    check_csrf()
+    session.clear()
     return redirect("/")
 

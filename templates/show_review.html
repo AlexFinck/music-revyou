@@ -15,7 +15,7 @@
     {% endif %}
     <p>
         Artist: {{ review.artist }}
-    </p>    
+    </p>
     <p>
         Release year: {{ review.release_year }}
     </p>
@@ -54,7 +54,7 @@
 
         <form action="/create_comment" method="post">
             <input type="hidden" name="review_id" value="{{ review.id }}" />
-            <input type="hidden" name="comment_token" value="{{ session.comment_token }}" />
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
 
             <p>
                 <label for="comment">Comment:</label><br />

@@ -14,9 +14,10 @@
   <p>
     Logged in with username {{ session.username }}
   </p>
-  <p>
-    <a href="/logout">Log out</a>
-  </p>
+  <form action="/logout" method="post">
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+      <button type="submit">Log out</button>
+  </form>
   {% else %}
   <form action="/login" method="post">
     <p>

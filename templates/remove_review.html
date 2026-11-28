@@ -10,6 +10,7 @@
     <p>Review: {{ review.album_title }}</p>
     <p>Are you sure you want to remove this review?</p>
     <form action="/remove_review/{{ review.id }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
         <input type="submit" name="remove" value="Remove review" >
         <input type="submit" name="back" value="Return">
     </form>
